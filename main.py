@@ -14,7 +14,6 @@ render_engine = 'EEVEE'
 samples = '1'
 denoising = 'True'
 time_limit = '5'
-scene = 'Scene'
 
 
 # Static Values
@@ -27,11 +26,11 @@ scripts = []
 if render_engine == 'CYCLES':
     for x in cameras:
         with open(f'build/{x}.py', 'w') as f:
-            f.write(f'import bpy; bpy.context.scene.camera = bpy.data.objects["{x}"]; bpy.context.scene.render.resolution_x = {x_res}; bpy.context.scene.render.resolution_y = {y_res}; bpy.context.scene.render.fps = {fps}; bpy.context.scene.render.image_settings.file_format = {format}; bpy.context.scene.frame_step = {step}; bpy.context.scene.cycles.samples = {samples}; bpy.context.scene.cycles.use_denoising = {denoising}; bpy.context.scene.cycles.time_limit = {time_limit}; bpy.context.scene.name = "{scene}"')
+            f.write(f'import bpy; bpy.context.scene.camera = bpy.data.objects["{x}"]; bpy.context.scene.render.resolution_x = {x_res}; bpy.context.scene.render.resolution_y = {y_res}; bpy.context.scene.render.fps = {fps}; bpy.context.scene.render.image_settings.file_format = {format}; bpy.context.scene.frame_step = {step}; bpy.context.scene.cycles.samples = {samples}; bpy.context.scene.cycles.use_denoising = {denoising}; bpy.context.scene.cycles.time_limit = {time_limit}')
 elif render_engine == 'EEVEE':
     for x in cameras:
         with open(f'build/{x}.py', 'w') as f:
-            f.write(f'import bpy; bpy.context.scene.camera = bpy.data.objects["{x}"]; bpy.context.scene.render.resolution_x = {x_res}; bpy.context.scene.render.resolution_y = {y_res}; bpy.context.scene.render.fps = {fps}; bpy.context.scene.render.image_settings.file_format = {format}; bpy.context.scene.frame_step = {step}; bpy.context.scene.eevee.taa_render_samples = {samples}; bpy.context.scene.name = "{scene}"')
+            f.write(f'import bpy; bpy.context.scene.camera = bpy.data.objects["{x}"]; bpy.context.scene.render.resolution_x = {x_res}; bpy.context.scene.render.resolution_y = {y_res}; bpy.context.scene.render.fps = {fps}; bpy.context.scene.render.image_settings.file_format = {format}; bpy.context.scene.frame_step = {step}; bpy.context.scene.eevee.taa_render_samples = {samples}')
 
 
 if render_engine == 'CYCLES':
@@ -46,6 +45,10 @@ with open('build/rendering.bat', 'w') as f:
     f.write(f'{blender_loc} -b ')
     f.write('  '.join(scripts))
     f.write('\n' + 'echo all done!')
+    f.write('\n' + 'PAUSE')
+    f.write('\n' + 'cd /d %cd%')
+    f.write('\n' + '''for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)''')
+
 
 subprocess.call([r'build\rendering.bat'])
 
