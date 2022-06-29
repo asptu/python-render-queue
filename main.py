@@ -46,8 +46,16 @@ with open('build/rendering.bat', 'w') as f:
     f.write('  '.join(scripts))
     f.write('\n' + 'echo all done!')
     f.write('\n' + 'PAUSE')
-    f.write('\n' + 'cd /d %cd%//build')
-    f.write('\n' + '''for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)''')
+    f.write('\n' + '''
+set folder="%cd%//build"
+IF EXIST "%folder%" (
+    cd /d %folder%
+    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+)
+''')
+
+
+
 
 
 subprocess.call([r'build\rendering.bat'])
