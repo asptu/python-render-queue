@@ -1,58 +1,32 @@
-import os
+import subprocess
 
-# Variable Values
+
+# Define Values
 scene = 'scene.blend'
-cameras = ['Camera1', 'Camera2']
+cameras = ['Camera1', 'Camera2', 'Camera3', 'Camera4']
 start_frame = '5'
-end_frame = '6'
+end_frame = '7'
 
 
 # Static Values
-blenderLoc = r'"C:\Program Files\Blender Foundation\Blender 3.0\blender.exe"'
+blenderLoc = r'"C:\Program Files\Blender Foundation\Blender 3.2\blender.exe"'
 path = 'project_files/' + scene
-camerasNum = len(cameras)
+scripts = []
 
 
-
-
-for i in cameras:
-    print(cameras)
-
-
-    
-#os.putenv("CAMERAS", cameras)
-#os.putenv("NUM", camerasNum)
-# os.putenv("LOCATION", blenderLoc)
-# os.putenv("PATH", path)
-# os.putenv("SFRAME", start_frame)
-# os.putenv("EFRAME", end_frame)
-# os.system("test2.bat")
-
-
-
-
-
-
-
-""" path = 'project_files/' + scene
-os.putenv("PATH", path)
-
-os.system("data\cameras.bat")
-
-
-fileName = 'data/cameras.txt'
-
-def readFile(fileName):
-        fileObj = open(fileName, "r") #opens the file in read mode
-        words = fileObj.read().splitlines() #puts the file into an array
-        fileObj.close()
-        print(words)
-
+# Script Compiler
+for x in cameras:
+    with open(f'build/{x}.py', 'w') as f:
+        f.write(f'import bpy; bpy.context.scene.camera = bpy.data.objects["{x}"]')
 
 
 for x in cameras:
-    print(x)
+    scripts.append(f'{path} --python %cd%//build//{x}.py -o %cd%//render_files//{x}//frame_# -E BLENDER_EEVEE -s {start_frame} -e {end_frame} -a')
 
-import bpy
-bpy.context.scene.camera = bpy.data.objects["Camera1"]
-"""
+with open('build/rendering.bat', 'w') as f:
+    f.write(f'{blenderLoc} -b ')
+    f.write('  '.join(scripts))
+
+subprocess.call([r'C:\Users\a\Documents\Blener_RenderQ_Python\build\rendering.bat'])
+
+

@@ -1,0 +1,1 @@
+import bpy; bpy.context.scene.camera = bpy.data.objects["Camera2"]
