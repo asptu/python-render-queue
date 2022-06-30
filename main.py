@@ -2,18 +2,18 @@ import subprocess
 
 # Define Values
 file = 'scene.blend'
-cameras = ['Camera1', 'Camera2', 'Camera3', 'Camera4']
-start_frame = '5'
-end_frame = '5'
-x_res = '400'
-y_res = '400'
+cameras = ['Camera1','Camera2']
+start_frame = '1'
+end_frame = '60'
+x_res = '200'
+y_res = '200'
 fps = '24'
 format = "'PNG'"
 step = '1'
 render_engine = 'EEVEE'
 samples = '1'
 denoising = 'True'
-time_limit = '5'
+time_limit = '0'
 
 
 # Static Values
@@ -44,19 +44,14 @@ elif render_engine == 'EEVEE':
 with open('build/rendering.bat', 'w') as f:
     f.write(f'{blender_loc} -b ')
     f.write('  '.join(scripts))
-    f.write('\n' + 'echo all done!')
-    f.write('\n' + 'PAUSE')
     f.write('\n' + '''
+echo all done!
+PAUSE
 set folder="%cd%//build"
 IF EXIST "%folder%" (
     cd /d %folder%
     for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
-)
-''')
-
-
-
-
+)''')
 
 subprocess.call([r'build\rendering.bat'])
 
