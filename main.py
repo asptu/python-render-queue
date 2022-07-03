@@ -1,5 +1,4 @@
 import subprocess
-import shutil
 
 # Define Values
 file = 'scene.blend'
@@ -68,12 +67,12 @@ set str=%str:~0,-5%''' + '\n')
         f.write('\n' + '''
 echo all done!
 PAUSE
-SETLOCAL
-SET "keepfile=ffmpeg.exe"
-
-FOR %%a IN ("%cd%//build//*") DO IF /i NOT "%%~nxa"=="%keepfile%" DEL "%%a"
-
-GOTO :EOF''')
+set folder="%cd%//build"
+IF EXIST "%folder%" (
+    cd /d %folder%
+    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+)
+''')
 
 subprocess.call([r'build\rendering.bat'])
 
