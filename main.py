@@ -1,12 +1,13 @@
 import subprocess
+import shutil
 
 # Define Values
 file = 'scene.blend'
 cameras = ['Camera1','Camera2']
 start_frame = '1'
 end_frame = '60'
-x_res = '200'
-y_res = '200'
+x_res = '1280'
+y_res = '720'
 fps = '24'
 format = "'PNG'"
 step = '1'
@@ -14,12 +15,15 @@ render_engine = 'EEVEE'
 samples = '1'
 denoising = 'True'
 time_limit = '0'
+encoding_format = 'PRORES_4444'
+
 
 
 # Static Values
 blender_loc = r'"C:\Program Files\Blender Foundation\Blender 3.0\blender.exe"'
 path = 'project_files/' + file
 scripts = []
+ffmpeg_scripts = []
 
 
 # Script Compiler
@@ -41,17 +45,35 @@ elif render_engine == 'EEVEE':
         scripts.append(f'{path} --python "%cd%//build//{x}.py" -o "%cd%//render_files//{x}//frame_#" -E BLENDER_EEVEE -s {start_frame} -e {end_frame} -a')
 
 
+
+if encoding_format == 'PRORES_4444':
+    for x in cameras:
+        ffmpeg_scripts.append(f'ffmpeg -f image2 -r {fps} -i "%cd%\\render_files\\{x}\\frame_%%d.png" -c:v prores_ks -profile:v 4 -vendor apl0 -bits_per_mb 8000 -pix_fmt yuva444p10le "%cd%\\render_files\\{x}\\{x}_PRORES_4444.mov"')
+        encoding = True
+elif encoding_format == 'MP4':
+    print('soon tm')
+    encoding = True
+else:
+    encoding = False
+
+
 with open('build/rendering.bat', 'w') as f:
     f.write(f'{blender_loc} -b ')
     f.write('  '.join(scripts))
-    f.write('\n' + '''
+    if encoding == True:
+        f.write('\n' + '''
+set str=%cd%
+set str=%str:~0,-5%''' + '\n')
+        f.write('\n'.join(ffmpeg_scripts))
+        f.write('\n' + '''
 echo all done!
 PAUSE
-set folder="%cd%//build"
-IF EXIST "%folder%" (
-    cd /d %folder%
-    for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
-)''')
+SETLOCAL
+SET "keepfile=ffmpeg.exe"
+
+FOR %%a IN ("%cd%//build//*") DO IF /i NOT "%%~nxa"=="%keepfile%" DEL "%%a"
+
+GOTO :EOF''')
 
 subprocess.call([r'build\rendering.bat'])
 
