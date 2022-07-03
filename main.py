@@ -17,13 +17,11 @@ time_limit = '0'
 encoding_format = 'PRORES_4444'
 
 
-
 # Static Values
 blender_loc = r'"C:\Program Files\Blender Foundation\Blender 3.0\blender.exe"'
 path = 'project_files/' + file
 scripts = []
 ffmpeg_scripts = []
-
 
 # Script Compiler
 if render_engine == 'CYCLES':
@@ -44,7 +42,6 @@ elif render_engine == 'EEVEE':
         scripts.append(f'{path} --python "%cd%//build//{x}.py" -o "%cd%//render_files//{x}//frame_#" -E BLENDER_EEVEE -s {start_frame} -e {end_frame} -a')
 
 
-
 if encoding_format == 'PRORES_4444':
     for x in cameras:
         ffmpeg_scripts.append(f'ffmpeg -f image2 -r {fps} -i "%cd%\\render_files\\{x}\\frame_%%d.png" -c:v prores_ks -profile:v 4 -vendor apl0 -bits_per_mb 8000 -pix_fmt yuva444p10le "%cd%\\render_files\\{x}\\{x}_PRORES_4444.mov"')
@@ -58,13 +55,10 @@ else:
 
 with open('build/rendering.bat', 'w') as f:
     f.write(f'{blender_loc} -b ')
-    f.write('  '.join(scripts))
+    f.write('  '.join(scripts) + '\n')
     if encoding == True:
-        f.write('\n' + '''
-set str=%cd%
-set str=%str:~0,-5%''' + '\n')
         f.write('\n'.join(ffmpeg_scripts))
-        f.write('\n' + '''
+    f.write('\n' + '''
 echo all done!
 PAUSE
 set folder="%cd%//build"
