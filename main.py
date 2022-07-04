@@ -2,7 +2,7 @@ import subprocess
 
 # Define Values
 file = 'scene.blend'
-cameras = ['Camera1','Camera2']
+cameras = ['Camera1']
 start_frame = '1'
 end_frame = '60'
 x_res = '1280'
@@ -47,7 +47,8 @@ if encoding_format == 'PRORES_4444':
         ffmpeg_scripts.append(f'ffmpeg -f image2 -r {fps} -i "%cd%\\render_files\\{x}\\frame_%%d.png" -c:v prores_ks -profile:v 4 -vendor apl0 -bits_per_mb 8000 -pix_fmt yuva444p10le "%cd%\\render_files\\{x}\\{x}_PRORES_4444.mov"')
         encoding = True
 elif encoding_format == 'MP4':
-    print('soon tm')
+    for x in cameras:
+        ffmpeg_scripts.append(f'ffmpeg -f image2 -r {fps} -i "%cd%\\render_files\\{x}\\frame_%%d.png" -c:v libx264 -preset slow -crf 20 -c:a aac -b:a 160k -vf format=yuv420p "%cd%\\render_files\\{x}\\{x}_MP4.mp4"')
     encoding = True
 else:
     encoding = False
